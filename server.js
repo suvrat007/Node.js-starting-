@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 
 console.log(__filename, __dirname)
 
-const server = http.createServer((req,res) => {
+const server = http.createServer(async(req,res) => {
     // res.write('Hello  World!');
 
     // res.setHeader('Content-Type', 'text/html')
@@ -20,18 +20,23 @@ const server = http.createServer((req,res) => {
     // console.log(req.url);    
     // console.log(req.method);    
 
+
+    // Check if GET request
     try {
-        if(req.meathod=='GET'){
+        if(req.meathod==='GET'){
+            let filePath;
             if(req.url=='/'){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.end('<h1>Hello World!</h1>');
+                filePath=path.join(__dirname,'public','index.html');
             }else if(req.url === '/about'){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.end('<h1>About Us</h1>');
+                filePath= path.join(__dirname,'pubic','about.html');                
             }else{
-                res.writeHead(404, {'Content-Type': 'teext/hmtl'});
-                res.end('<h1>Not Found</h1>');
+                throw new Error('Not Found')
             }
+
+            const data = await fs.readFile(filePath);
+            res.setHeader('Content-Type', 'text/html');
+            res.write(data);
+            res.end();
         }else {
             throw new Error('Meathod Not Allowed');
         }
